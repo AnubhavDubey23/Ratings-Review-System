@@ -1,6 +1,6 @@
 const db = require('../models/db');
 
-exports.addReview = async (req, res) => {
+exports.addReview = async (req, res,next) => {
   const { email, productId, rating, reviewText } = req.body;
   const photoUrl = req.uploadedPhoto?.url || null; // Using Cloudinary URL instead of local path
 
@@ -51,9 +51,13 @@ exports.addReview = async (req, res) => {
     });
   } catch (err) {
     console.error('Database error:', err);
-    res.status(500).json({
-      message: 'Failed to submit review. Please try again.',
-    });
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        error: 'Internal Server Error',
+        details: process.env.NODE_ENV === 'development' ? err.message : undefined
+      });
+    }
+    next(err);  
   }
 };
 

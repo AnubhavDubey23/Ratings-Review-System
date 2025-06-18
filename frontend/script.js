@@ -46,7 +46,9 @@ form.addEventListener('submit', async (e) => {
     }
   } catch (err) {
     console.error(err);
-    message.innerText = 'Error submitting review';
+    message.innerText = err.message.includes('HTML') 
+      ? 'Server configuration error (contact admin)'
+      : err.message;
   }
 });
 

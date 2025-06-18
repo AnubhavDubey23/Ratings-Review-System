@@ -1,8 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const reviewRoutes = require('./routes/reviews');
 
 const app = express();
@@ -19,6 +17,10 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));  
+
+// Routes
+app.use('/api/reviews', reviewRoutes);
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Routes
@@ -29,7 +31,9 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Increase timeout to 30 seconds (Render's default is only 5s)
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
+server.setTimeout(30000);  // 30 seconds
