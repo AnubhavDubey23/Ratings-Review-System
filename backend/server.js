@@ -11,11 +11,11 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(
   cors({
-    origin: [
-      'http://localhost:3000',
-      'https://your-render-frontend-url.onrender.com',
-    ],
-    methods: ['GET', 'POST'],
+     origin: [
+    'http://localhost:3000',              // For local development
+    'https://ratings-review-system-rn1e.onrender.com'  // Render backend URL
+  ],
+  methods: ['GET', 'POST'],
   })
 );
 app.use(express.json());

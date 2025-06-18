@@ -4,7 +4,7 @@ const message = document.getElementById('message');
 const API_BASE =
   window.location.hostname === 'localhost'
     ? 'http://localhost:3000'
-    : 'https://your-render-backend-url.onrender.com';
+    : 'https://ratings-review-system-rn1e.onrender.com';
 
 function showForm(productId) {
   document.getElementById('productId').value = productId;
