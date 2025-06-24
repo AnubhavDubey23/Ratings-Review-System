@@ -34,16 +34,24 @@ form.addEventListener('submit', async (e) => {
   if (photo) formData.append('photo', photo);
 
   try {
-    const res = await fetch('${API_BASE}/api/reviews', {
+    const res = await fetch(`${API_BASE}/api/reviews`, {
       method: 'POST',
       body: formData,
     });
-    const data = await res.json();
-    message.innerText = data.message;
-    if (res.ok) {
-      hideForm();
-      loadReviews(productId);
+    // Check for HTML errors
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);  // Try to parse as JSON
+    } catch {
+      throw new Error(`Server returned HTML: ${text.substring(0, 100)}...`);
     }
+
+    if (!res.ok) throw new Error(data.message || 'Submission failed');
+    
+    message.innerText = data.message;
+    hideForm();
+    loadReviews(productId);
   } catch (err) {
     console.error(err);
     message.innerText = err.message.includes('HTML') 
@@ -74,4 +82,5 @@ async function loadReviews(productId) {
 window.onload = () => {
   loadReviews(1);
   loadReviews(2);
+  loadReviews(3);
 };

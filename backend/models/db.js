@@ -1,13 +1,16 @@
 // backend/models/db.js
 const { Pool } = require('pg');
+require('dotenv').config();
 
 // Create a new PostgreSQL connection pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // Required for Render's PostgreSQL
-  },
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 20, // optional: limit the number of clients
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000
 });
+
 
 pool.on('connect', () => console.log('DB connected'));
 pool.on('error', (err) => console.error('DB error', err));
@@ -37,7 +40,8 @@ async function initDatabase() {
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
-        description TEXT
+        description TEXT,
+        image_url TEXT
       );
       
       CREATE TABLE IF NOT EXISTS reviews (
@@ -52,6 +56,12 @@ async function initDatabase() {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
       );
+
+      INSERT INTO products (id, name, description, image_url) VALUES
+        (1, 'Running sneakers', 'Men''s Stylish Sports Running Shoes | Lightweight Breathable Sneakers for Gym, Walking', 'https://res.cloudinary.com/dxnb81vi1/image/upload/v1750765902/shoe_podeeg.jpg'),
+        (2, 'Skipping Rope', 'Boldfit Skipping Rope for Men and Women Jumping Rope With Adjustable Height', 'https://res.cloudinary.com/dxnb81vi1/image/upload/v1750765902/rope_ijhyji.jpg'),
+        (3, 'Yoga Mat', 'Cockatoo Super Premium 5.5 MM Pure Natural Rubber Non Slip Yoga Mat', 'https://res.cloudinary.com/dxnb81vi1/image/upload/v1750765901/mat_nejn5p.jpg')
+      ON CONFLICT (id) DO NOTHING;    
     `);
     console.log('Database tables initialized');
   } catch (err) {
